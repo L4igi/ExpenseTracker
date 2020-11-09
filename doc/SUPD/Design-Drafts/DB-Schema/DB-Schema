@@ -1,0 +1,30 @@
+User(id, username)
+PK: id
+
+Account(accountID, userID, accountType, accountName) //Idee, userID nicht als PK sondern (userID + accountName) unique not null constraint 
+PK: accountID, userID
+FK: accountID <> Account.accountID, userID <> User.id
+
+	GiroAccount(accountID)
+	PK: accountID
+	FK: accountID <> Account.accountID
+
+		StudentAccount(accountID, StudentNumber)
+		PK: accountID
+		FK: accountID <> GiroAccount.accountID
+		
+		
+	CashAccount(accountID)
+	PK: accountID
+	FK: accountID <> Account.accountID
+
+	BusinessAccount(accountID)
+	PK: accountID
+	FK: accountID <> Account.accountID
+
+Transaction(transactionID, fromAccount, toAccount, amount, transactionType, transactionDate, transactionDescription, transactionCategory)
+PK: transactionID
+FK: fromAccount <> Account.accountID, toAccount <> Account.accountID
+
+
+

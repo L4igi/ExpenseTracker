@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<title>Expense Tracker</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<script src="https://kit.fontawesome.com/7eeea0efdd.js" crossorigin="anonymous"></script>
+
+<script src="js/websocket.js"></script>
+<style>
+    body {
+        height: 100%;
+        background-image: url('./img/stock1.jpg');
+    }
+
+    #mainsitecontainer {
+        height: 100%;
+    }
+
+    #leftbar {
+        background-color: #FFF;
+        width: 160px;
+        height: 100%;
+        transform: skewX(-4deg);
+        transform-origin: top left;
+        z-index: +1;
+        position: absolute;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        transition: 0.3s;
+    }
+
+    #loginContainer, #createContainer {
+        width: 600px;
+        min-height: 100px;
+        background-color: white;
+        border-left: 150px solid #607d8b;
+        border-right: 5px solid #607d8b;
+        border-top: 5px solid #607d8b;
+        border-bottom: 5px solid #607d8b;
+        position: absolute;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+        transition: 0.3s;
+        margin-top: 35vh;
+    }
+
+    #loginContainer > div, #createContainer > div {
+        border: 1px solid lightgrey;
+        margin: 10px;
+        padding: 10px;
+    }
+
+</style>
+<body>
+<div id="mainsitecontainer" class="">
+    <div class="" style="" id="leftbar"></div>
+    <div class="" id="createContainer">
+        <div id="createAccount">
+            <h2 class="w3-center">Create Account</h2>
+            <hr/>
+            <form onsubmit="createUser()" target="dummyframe">
+                <input type="text" class="w3-input w3-center w3-large" required name="username" id="username"
+                       placeholder="New Username">
+                <button class="w3-button w3-blue-grey w3-large" style="width:100%; margin-top:16px;">Create Account >
+                </button>
+            </form>
+            <span class="w3-center" id="showExistingSpan" style="font-size:12px;"><a href="#"
+                                                                                     onclick="show_existing_user()">Login using existing Account.</a></span>
+        </div>
+    </div>
+    <div class="" id="loginContainer" style="display:none;">
+        <div>
+            <h2 class="w3-center">Login as:</h2>
+            <div class="w3-xlarge" id="loginTiles"></div>
+            <span class="w3-center" style="font-size:12px;"><a href="#" onclick="show_add_user()">Create new Useraccount.</a></span>
+
+        </div>
+    </div>
+
+</div>
+
+<iframe style="display: none" width="0" height="0" border="0" name="dummyframe" id="dummyframe"></iframe>
+<!-- dummyframe necesarry so form wont submit-->
+<script src="js/js.js"></script>
+<script type="application/javascript">
+    function generateIcon() {
+        //grain is basically level of detail. higher = finer.
+        var grain = 7;
+        var blockout = Math.random();
+        var canvas = document.getElementById('genIconcanvas');
+        var w = canvas.width;
+        var h = canvas.width;
+        var colorArray = [];
+
+        if (canvas.getContext) {
+            var ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = "transparent";
+            ctx.fillRect(0, 0, w, h);
+
+            function randomRGB(min, max) {
+                var min = Math.ceil(min);
+                var max = Math.floor(max);
+                for (var i = 0; i < 3; i++) {
+                    colorArray.push(Math.floor(Math.random() * (max - min)) + min);
+                }
+            }
+
+            function pokeOut() {
+                randomRGB(0, 255);
+                var posX = 0;
+                var posY = 0;
+                var startFillRed = colorArray[0];
+                var startFillGreen = colorArray[1];
+                var startFillBlue = colorArray[2];
+                var colorRange = 5;
+                ctx.fillStyle = "rgb(" + startFillRed + "," + startFillGreen + "," + startFillBlue + ")";
+
+                for (var y = 0; y < grain; y++) {
+                    for (var x = 0; x < grain; x++) {
+                        if (blockout < .4) {
+                            ctx.fillRect(posX, posY, w / grain, h / grain);
+                            ctx.fillRect(w - posX - w / grain, posY, w / grain, h / grain);
+                            posX += w / grain;
+                        } else {
+                            startFillRed -= colorRange;
+                            startFillGreen += colorRange;
+                            startFillBlue += colorRange;
+                            ctx.fillStyle = "rgb(" + startFillRed + "," + startFillGreen + "," + startFillBlue + ")";
+                            posX += w / grain;
+                        }
+                        blockout = Math.random();
+                    }
+                    posY += h / grain;
+                    posX = 0;
+                }
+            }
+        }
+        pokeOut();
+        return canvas.toDataURL();
+    }
+
+    // initiating the user listing by gathering the info, calling function to actually list them
+    function list_users() {
+        var path = "getAllUsers";
+        var data_file = "./" + path;
+        var http_request = new XMLHttpRequest();
+        http_request.onreadystatechange = function () {
+            if (http_request.readyState == 4) {
+                var jsonObj = JSON.parse(http_request.responseText);
+                if (jsonObj.length == 1) {
+                    show_add_user();
+                    document.getElementById("showExistingSpan").style.visibility = "hidden";
+
+                }
+                document.getElementById("loginTiles").innerHTML = "";
+                for (i in jsonObj) {
+                    if (jsonObj[i].id != 1)
+                        add_user_to_list(jsonObj[i].id, jsonObj[i].username, jsonObj[i].imageIcon);
+                }
+                //window.open("./overview.html?id="+jsonObj.id+"&username="+jsonObj.username,"_self");
+            }
+        }
+        http_request.open("GET", data_file, true);
+        http_request.send();
+    }
+
+    function add_user_to_list(uid, uname, icon) {
+        document.getElementById("loginTiles").innerHTML += `<a href="#" style="text-decoration: none;"><div onclick="login_as('${uid}','${uname}')" class="w3-card-8 w3-margin w3-container tile"><img src="${icon}" alt="Avatar" class="w3-left w3-margin-right" style="width:60px"><span class="vertical-center" style="margin-top: auto; margin-bottom: auto;">${uname}</span></div></a>`
+
+    }
+
+    function login_as(uid, uname) {
+        setCookie("username", uname);
+        setCookie("id", uid);
+        window.open("./overview.html", "_self");
+    }
+
+    function createUser() {
+        var data_file = "./createUser?username=" + document.getElementById("username").value + '&imageIcon=' + encodeURIComponent(generateIcon()) + '';
+        var http_request = new XMLHttpRequest();
+        http_request.onreadystatechange = function () {
+            if (http_request.readyState == 4) {
+                var jsonObj = JSON.parse(http_request.responseText);
+
+                login_as(jsonObj.id, jsonObj.username);
+            }
+        }
+        http_request.open("GET", data_file, true);
+        http_request.send();
+    }
+
+    function createTestData() {
+        var URL = "./createManyTransactions";
+        var http_request = new XMLHttpRequest();
+        http_request.onreadystatechange = function () {
+            if (http_request.readyState == 4) {
+                location.reload();
+            }
+        }
+        http_request.open("GET", URL, true);
+        http_request.send();
+    }
+
+
+    show_existing_user();
+
+</script>
+<canvas id='genIconcanvas' style="visibility:hidden!important;" height='256px' width='256px'></canvas>
+<canvas style="visibility: hidden;" id="marxcanv"></canvas>
+</body>
+</html>

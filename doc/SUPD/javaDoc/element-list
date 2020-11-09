@@ -1,0 +1,15 @@
+com.group33.swa
+com.group33.swa.exceptions
+com.group33.swa.model.account
+com.group33.swa.model.transaction
+com.group33.swa.model.user
+com.group33.swa.repository.account
+com.group33.swa.repository.transaction
+com.group33.swa.repository.user
+com.group33.swa.webController
+com.group33.swa.webController.account
+com.group33.swa.webController.transaction
+com.group33.swa.webController.user
+com.group33.swa.webServices.account
+com.group33.swa.webServices.transaction
+com.group33.swa.webServices.user

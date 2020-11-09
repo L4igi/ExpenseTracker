@@ -1,0 +1,40 @@
+{
+	"Accounts":
+	[
+	  {
+	    "accountID": 1,
+	    "accountType": "Giro",
+	    "accountName": "Kontoname",
+	    "currency": "$",
+	    "balance": 1869.15
+	  },
+	  {
+	  	"accountID": 2,
+	    "accountType": "Studentenkonto",
+	    "accountName": "teststudentenkonto",
+	    "currency": "€",
+	    "balance": -123.45
+	  }
+	]
+};
+
+{
+	"Transactions":
+	[
+	  {
+	    "TransactionID": 1,
+	    "accountID": 1,
+	    "title": "Strom",
+	    "date": "2019-09-22T02:40:55 -02:0",
+	    "amount": 1869.15
+	  },
+	  {
+	    "TransactionID": 2,
+	    "accountID": 1,
+	    "title": "Strom",
+	    "date": "2019-09-22T02:40:55 -02:0",
+	    "amount": -123.4
+	  }
+	]
+}
+

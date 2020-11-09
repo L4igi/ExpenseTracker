@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<title>Expense Tracker </title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<script src="https://kit.fontawesome.com/7eeea0efdd.js" crossorigin="anonymous"></script>
+<script src="https://d3js.org/d3.v4.js"></script>
+<script src="js/js.js"></script>
+
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-blue-grey.css">
+<link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans'>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!-- JavaScript & CSS Garber -->
+<script src="js/websocket.js"></script>
+<script src="js/util.js"></script>
+<link rel="stylesheet" href="css/snackbar.css">
+<!-- JavaScript Garber -->
+
+<style>
+    html, body, h1, h2, h3, h4, h5 {
+        font-family: "Open Sans", sans-serif
+    }
+
+</style>
+<body style="min-height: 100%;">
+
+<!-- Navbar -->
+<div class="w3-top">
+    <div class="w3-bar w3-theme-d2 w3-left-align w3-large">
+        <a href="/overview.html" class="w3-bar-item w3-button w3-padding-large w3-theme-d4"><i
+                class="fa fa-home w3-margin-right"></i>Home</a>
+        <div class="w3-dropdown-hover w3-right" style="margin-right: 25px;">
+            <a href="#" class="w3-bar-item w3-button w3-hide-small w3-padding-large w3-hover-white"
+               title="My Account">
+                <img id="barUserIcon" class="w3-circle" style=" background:white;height:23px;width:23px" alt="Avatar">
+            </a>
+            <div class="w3-dropdown-content w3-card-4 w3-bar-block" style="width:300px; margin-top:50px;margin-right: 25px;">
+                <a href="./" class="w3-bar-item w3-button">Logout</a>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Navbar on small screens -->
+
+<!-- Page Container -->
+<div class="w3-container w3-content" style="max-width:1400px;margin-top:80px;min-height: 75vh;">
+    <!-- The Grid -->
+    <div class="w3-row">
+        <!-- Left Column -->
+        <div class="w3-col m3">
+            <!-- Profile -->
+            <div class="w3-card w3-round w3-white">
+                <div class="w3-container">
+                    <h4 class="w3-center">My Accounts</h4>
+                    <p class="w3-center"><img id="bigAvatar" class="w3-circle" style="height:106px;width:106px"
+                                              alt="Avatar"></p>
+                    <p style="font-size: xx-small" class="w3-center">User-ID: <span id="titleUId"></span></p>
+                    <hr>
+                    <p><i class="fa fa-user fa-fw w3-margin-right w3-text-theme"></i> <span id="titleUsername"></span>
+                    </p>
+
+                </div>
+            </div>
+            <br>
+
+            <!-- Accordion -->
+            <div class="w3-card w3-round">
+                <div class="w3-white">
+                    <button class="w3-button w3-block w3-theme-l1 w3-left-align"
+                            onclick="document.getElementById('addAcc').style.display='block';"><i
+                            class="fa fa-plus fa-fw w3-margin-right"></i> Add Account
+                    </button>
+                    <button id="addTransactionButton" class="w3-button w3-block w3-theme-l1 w3-left-align"
+                            style="display: none;" onclick="document.getElementById('addTSide').style.display='block';">
+                        <i class="fa fa-plus fa-fw w3-margin-right"></i> Add Transaction
+                    </button>
+                    <div id="addTSide" style="display: none">
+                        <div onclick="document.getElementById('addT').style.display='block'; incomeButton();"
+                             class="w3-button w3-block w3-theme-l3 w3-left-align">income
+                        </div>
+                        <div onclick="document.getElementById('addT').style.display='block'; expenseButton();"
+                             class="w3-button w3-block w3-theme-l3 w3-left-align">expense
+                        </div>
+                    </div>
+                    <button onclick="launchFilter()" style="display:none;" id="filterAllTransactionsButton"
+                            class="w3-button w3-block w3-theme-l1 w3-left-align"><i
+                            class="fa fa-calendar-check-o fa-fw w3-margin-right"></i> Filter all Transactions
+                    </button>
+                </div>
+            </div>
+            <div class="w3-card w3-round">
+                <!--div class="w3-white" id="accountSideCard">
+
+                </div-->
+            </div>
+
+
+            <!-- End Left Column -->
+        </div>
+
+        <!-- Middle Column -->
+        <div class="w3-col m9">
+
+            <div class="w3-container w3-card w3-white w3-round w3-margin-bottom w3-margin-left w3-display-container"
+                 id="addAcc"
+                 style="display:none">
+                <span onclick="this.parentElement.style.display='none'"
+                      class="w3-button w3-theme-l3 w3-display-topright"><i class="fa fa-remove"></i></span>
+                <div class="">
+                    <div class="w3-container w3-center"><h3>Add new Account</h3></div>
+                    <form onsubmit="add_account()" target="dummyframe">
+                        <div class="w3-row-padding w3-container w3-margin">
+                            <div class="w3-half">
+                                <input required class="w3-input w3-border" id="accName" name="accName"
+                                       placeholder="Title">
+                            </div>
+                            <div class="w3-half">
+                                <select required class="w3-select w3-border" id="accType" name="accType"
+                                        onchange="accountSelect();">
+                                    <option value="" disabled selected>Type</option>
+                                    <option value="Giro">Giro</option>
+                                    <option value="Student">Student</option>
+                                    <option value="Cash">Cash</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="w3-row-padding w3-container w3-margin" id="addA2Row">
+                            <div class="w3-half">
+                                <input class="w3-input w3-border" style="display:none;" type="number" id="matrNr"
+                                       name="matrNr" placeholder="Student Number">
+                            </div>
+                            <div class="w3-half">
+                                <input class="w3-input w3-border" style="display:none;" id="limit" name="limit"
+                                       placeholder="Limit">
+                            </div>
+                            <div class="w3-half">
+                                <input class="w3-input w3-border" style="display:none;" id="startAmount"
+                                       name="startAmount" placeholder="Start Amount">
+                            </div>
+                        </div>
+
+
+                        <button type="submit" class="w3-button w3-block w3-theme-l1 w3-left-align w3-margin w3-center"
+                                style="max-width: 200px;">Create Account
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="w3-container w3-card w3-white w3-round w3-margin-bottom w3-margin-left w3-display-container"
+                 id="addT"
+                 style="display:none">
+                <span onclick="this.parentElement.style.display='none'"
+                      class="w3-button w3-theme-l3 w3-display-topright"><i class="fa fa-remove"></i></span>
+                <div class="">
+                    <div class="w3-container w3-center"><h3>Add new Transaction</h3></div>
+                    <form onsubmit="add_trans_from_form()" target="dummyframe">
+                        <div id="transactionForm" style="visibility: hidden;">
+                            <div class="w3-row-padding w3-margin w3-container">
+                                <div class="w3-half w3-container">
+                                    <input class="w3-input w3-border" placeholder="Description"
+                                           id="newTransactionTitle">
+                                </div>
+                                <div class="w3-half w3-container">
+                                    <input required class="w3-input w3-border" id="amount" name="amount"
+                                           placeholder="€ 0.00">
+                                </div>
+                            </div>
+                            <div class="w3-row-padding w3-container w3-margin">
+                                <!-- TODO Änderungen von Lukas, listung der eigenen Accounts in Dropdown. -->
+                                <div class="w3-half" style="vertical-align: bottom;" id="fromOtherAccountDiv">
+                                <span style="visibility: hidden;" id="fromOtherAccSpan"><input type="checkbox"
+                                                                                               onclick="expandAccount();"
+                                                                                               name="fromOtherAcc"
+                                                                                               value="fromOtherAcc"
+                                                                                               id="fromOtherAcc"> From other Account</span><br>
+                                    <select required class="w3-input w3-border" style="visibility: hidden;" id="fAcc"
+                                            name="accName" placeholder="Von Account" list="accountListFrom">
+                                        <option value="" selected="selected" disabled> Select Account</option>
+                                    </select>
+                                </div>
+                                <div class="w3-half">
+                                <span style="visibility: hidden;" id="toOtherAccSpan"><input type="checkbox"
+                                                                                             onclick="expandAccount();"
+                                                                                             name="toOtherAcc"
+                                                                                             value="toOtherAcc"
+                                                                                             id="toOtherAcc"> To other Account</span><br>
+                                    <select required class="w3-select w3-border" style="visibility: hidden;" id="tAcc"
+                                            name="toAccName" placeholder="To Account" id="accountListTo">
+                                        <option value="" selected="selected" disabled> Select Account</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            <div class="w3-row-padding w3-container w3-margin">
+                                <div class="w3-half">
+                                    <select required class="w3-select w3-border" id="tCat" name="tCat" onchange="">
+                                        <option value="" disabled selected>Category</option>
+                                        <option value="SALARY">Salary</option>
+                                        <option value="DIVIDEND">Dividend</option>
+                                        <option value="FOOD">Food</option>
+                                        <option value="TRANSPORTATION">Transportation</option>
+                                        <option value="EDUCATION">Education</option>
+                                        <option value="SELF">Self</option>
+                                    </select>
+                                </div>
+                                <div class="w3-half">
+                                    <select required class="w3-select w3-border" id="tTyp" name="tTyp" onchange="">
+                                        <option value="" disabled selected>Type of Transaction</option>
+                                        <option value="PRIVATE">PRIVATE</option>
+                                        <option value="BUSINESS">BUSINESS</option>
+                                        <option value="CRYPTO">CRYPTO</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="w3-row-padding w3-margin w3-container">
+                                <div class="w3-third">
+                                    <input class="w3-input w3-border" id="newTransactionDate" type="date">
+                                </div>
+                                <div class="w3-third">&#10240;</div>
+                                <div class="w3-third w3-right-align">
+                                    <button type="submit" class="w3-button w3-block w3-theme-l1">Create Transaction
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+            <div class="w3-container w3-card w3-white w3-round w3-margin-bottom w3-margin-left" style="display: none;"
+                 id="transFilterChart">
+                <span onclick="this.parentElement.style.display='none'"
+                      class="w3-button w3-theme-l3 w3-display-topright"><i class="fa fa-remove"></i></span>
+                <div id="barplot" class="w3-center"></div>
+            </div>
+
+            <div class="w3-container w3-card w3-white w3-round w3-margin-bottom w3-margin-left w3-display-container"
+                 id="transFilter"
+                 style="display:none">
+                <span onclick="this.parentElement.style.display='none'"
+                      class="w3-button w3-theme-l3 w3-display-topright"><i class="fa fa-remove"></i></span>
+
+                <div class="">
+                    <h2>Filter your Transactions</h2>
+                    <div id="filterSelection">
+                        <div id="filterByDate1" class="w3-row">
+                            <div class="w3-third"><select required class="w3-select w3-border" id="fromYear"
+                                                          name="fromYear"
+                                                          onchange="fillFilterM1();fillFilterY2()">
+                            </select></div>
+                            <div class="w3-third"><select required class="w3-select w3-border" id="fromMonth"
+                                                          name="fromMonth" onchange="fillFilterD1();fillFilterM2()">
+                            </select></div>
+                            <div class="w3-third"><select required class="w3-select w3-border" id="fromDay"
+                                                          name="fromDay" onchange="fillFilterD2()">
+                            </select></div>
+                        </div>
+                        <div id="filterByDate2" class="w3-row">
+                            <div class="w3-third">
+                                <select required class="w3-select w3-border" id="toYear" name="toYear"
+                                        onchange="fillFilterM2()"></select>
+                            </div>
+                            <div class="w3-third">
+                                <select required class="w3-select w3-border" id="toMonth" name="toMonth"
+                                        onchange="fillFilterD2()"></select>
+                            </div>
+                            <div class="w3-third">
+                                <select required class="w3-select w3-border" id="toDay" name="toDay" onchange="listAllFilteredTransactions()"></select>
+                            </div>
+                        </div>
+                        <div class="w3-row">
+                            <div class="w3-third">
+                                <select required class="w3-select w3-border" id="fCat" name="fCat"
+                                        onchange="listAllFilteredTransactions()">
+                                    <option value="" disabled selected>Category</option>
+                                    <option value="">ALL</option>
+                                    <option value="SALARY">Salary</option>
+                                    <option value="DIVIDEND">Dividend</option>
+                                    <option value="FOOD">Food</option>
+                                    <option value="TRANSPORTATION">Transportation</option>
+                                    <option value="EDUCATION">Education</option>
+                                    <option value="SELF">Self</option>
+                                </select>
+                            </div>
+                            <div class="w3-third">
+                                <select required class="w3-select w3-border" id="fTyp" name="fTyp"
+                                        onchange="listAllFilteredTransactions()">
+                                    <option value="" disabled selected>Type</option>
+                                    <option value="">ALL</option>
+                                    <option value="PRIVATE">PRIVATE</option>
+                                    <option value="BUSINESS">BUSINESS</option>
+                                    <option value="CRYPTO">CRYPTO</option>
+                                </select>
+                            </div>
+                            <div class="w3-third">
+                                <select required class="w3-select w3-border" id="fBal" name="fBal"
+                                        onchange="listAllFilteredTransactions()">
+                                    <option value="" disabled selected>Type</option>
+                                    <option value="">ALL</option>
+                                    <option value="INCOME">INCOME</option>
+                                    <option value="EXPENSE">EXPENSE</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="filteredTransactionListContainer">
+                        <ul id="filteredTransactionList" class="w3-ul w3-white">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w3-container w3-card w3-white w3-round w3-margin-bottom w3-margin-left" style="display: none;"
+                 id="accountCard">
+                <h1>Accounts:</h1>
+                <div id="konten" class="w3-margin">
+
+                </div>
+            </div>
+        </div>
+        <!-- End Middle Column -->
+    </div>
+</div>
+
+<!-- End Page Container -->
+
+<br>
+
+<!-- Footer -->
+<footer class="w3-container w3-theme-d3 w3-padding-16">
+    <h5>Expense Tracker</h5>
+</footer>
+
+<footer class="w3-container w3-theme-d5">
+    <p>2019w SE2 Team 0210</p>
+</footer>
+
+<script>
+
+
+    // Used to toggle the menu on smaller screens when clicking on the menu button
+    function openNav() {
+        var x = document.getElementById("navDemo");
+        if (x.className.indexOf("w3-show") == -1) {
+            x.className += " w3-show";
+        } else {
+            x.className = x.className.replace(" w3-show", "");
+        }
+    }
+</script>
+
+<iframe width="0" heighstartConfettit="0" border="0" name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+<!-- dummyframe necesarry so form wont submit-->
+
+<script type="text/javascript">
+    function showTransactionForm() {
+        document.getElementById("transactionForm").style.visibility = "visible";
+        document.getElementById("fromOtherAcc").checked = false;
+        document.getElementById("toOtherAcc").checked = false;
+        expandAccount();
+    }
+
+    function incomeButton() {
+        showTransactionForm();
+        document.getElementById("fromOtherAccSpan").style.visibility = "visible";
+        document.getElementById("tAcc").style.visibility = "visible";
+        document.getElementById("tAcc").required = true;
+        document.getElementById("fAcc").required = false;
+        document.getElementById("toOtherAccSpan").style.visibility = "hidden";
+        document.getElementById("fAcc").style.visibility = "hidden";
+        document.getElementById("toOtherAcc").checked = true;
+    }
+
+    function expenseButton() {
+        showTransactionForm();
+        document.getElementById("toOtherAccSpan").style.visibility = "visible";
+        document.getElementById("fAcc").style.visibility = "visible";
+        document.getElementById("tAcc").required = false;
+        document.getElementById("fAcc").required = true;
+        document.getElementById("fromOtherAccSpan").style.visibility = "hidden";
+        document.getElementById("tAcc").style.visibility = "hidden";
+        document.getElementById("fromOtherAcc").checked = true;
+
+    }
+
+    function expandAccount() {
+
+        // Get the output text
+
+        // If the checkbox is checked, display the output text
+        if (document.getElementById("toOtherAcc").checked == true) {
+            document.getElementById("tAcc").style.visibility = "visible";
+
+        } else {
+            document.getElementById("tAcc").style.visibility = "hidden";
+        }
+
+        if (document.getElementById("fromOtherAcc").checked == true) {
+            document.getElementById("fAcc").style.visibility = "visible";
+
+        } else {
+            document.getElementById("fAcc").style.visibility = "hidden";
+        }
+    }
+
+
+    window.onclick = function (event) {
+
+        if (event.target == document.getElementById("addAcc")) {
+            document.getElementById("addAcc").style.display = "none";
+        }
+        if (event.target == document.getElementById("addT")) {
+            document.getElementById("addT").style.display = "none";
+        }
+        if (event.target == document.getElementById("filterModal")) {
+            document.getElementById("filterModal").style.display = "none";
+        }
+    };
+
+
+    //document.getElementById('newTransactionDate').valueAsDate = new Date();
+    var uID = getCookie("id");
+    var uName = getCookie("username");
+    document.onreadystatechange = function () {
+        if (document.readyState == "complete") {
+            document.getElementById("titleUId").innerHTML = uID;
+            document.getElementById("titleUsername").innerHTML = uName;
+
+            list_accounts(uID);
+            getAllAccountsForTransaction(uID);
+            insertUserImageProxy();
+            fillFilterY1();
+        }
+    }
+
+
+</script>
+<!-- The actual snackbar -->
+<div id="snackbar"></div>
+</body>
+</html>
